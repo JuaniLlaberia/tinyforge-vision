@@ -1,0 +1,19 @@
+TinyForge-Vision
+Copyright 2026 Juan Ignacio Llaberia
+
+This project is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This project includes code from nanoVLM (https://github.com/huggingface/nanoVLM),
+tag v0.1, commit 6ba9082.
+Copyright 2025- The Hugging Face team. All rights reserved.
+Licensed under the Apache License, Version 2.0.
+
+Every file borrowed from nanoVLM carries a header naming its source file. The only
+changes to borrowed code are formatting (one blank line between definitions, double
+quotes), added docstrings and type hints, and import paths adapted to the `tfv` package. The one
+exception is a compatibility branch in tfv/models/language_model.py (marked [tinyforge-vision])
+that computes the same masked causal attention on CPU/MPS, where PyTorch rejects v0.1's call;
+the CUDA path is unchanged.
+
+The MMStar evaluation (tfv/eval/) is kept logically unchanged so scores remain
+comparable with the published nanoVLM-222M result (35.3%).
