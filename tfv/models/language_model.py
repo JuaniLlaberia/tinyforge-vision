@@ -207,10 +207,10 @@ class LanguageModelGroupedQueryAttention(nn.Module):
             # Convert to attention mask where 0 keeps values and -inf masks
             attention_mask = (1.0 - attention_mask) * torch.finfo(q.dtype).min
 
-        if self.sdpa and attention_mask is not None and x.device.type != "cuda":
-            # [tinyforge-vision] CPU/MPS SDPA raises "Explicit attn_mask should not be set when
-            # is_causal=True". Fold the causal mask into the padding mask instead: future positions
-            # get the same large negative value, giving the same attention as the CUDA path.
+        if self.sdpa and attention_mask is not None:
+            # [tinyforge-vision] Recent PyTorch SDPA raises "Explicit attn_mask should not be set when
+            # is_causal=True" (on CPU, MPS and CUDA). Fold the causal mask into the padding mask instead:
+            # future positions get the same large negative value, giving causal + padding attention.
             future = torch.ones(T, T, dtype=torch.bool, device=x.device).triu(1)  # [T, T], True above the diagonal
             combined_mask = torch.where(future, torch.finfo(q.dtype).min, attention_mask)  # [B, 1, T, T]
             y = torch.nn.functional.scaled_dot_product_attention(
@@ -219,7 +219,7 @@ class LanguageModelGroupedQueryAttention(nn.Module):
                 dropout_p=self.dropout if self.training else 0.0,
                 is_causal=False
             )
-        elif self.sdpa:
+        elif self.sdpa:  # [tinyforge-vision] Only reached without a padding mask: the original call, unchanged
             y = torch.nn.functional.scaled_dot_product_attention(
                 q, k, v,
                 attn_mask=attention_mask,

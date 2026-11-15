@@ -5,9 +5,9 @@ from tfv.models.language_model import LanguageModelGroupedQueryAttention, Rotary
 
 def test_cpu_attention_branch_matches_v01() -> None:
     """
-    The [tinyforge-vision] CPU/MPS branch (merged causal + padding mask) gives the same outputs on
-    real tokens as the original manual-attention path, has no NaNs even when a row is mostly padding,
-    and equals the original causal SDPA call when there is no padding.
+    The [tinyforge-vision] SDPA branch (merged causal + padding mask, used on every device) gives
+    the same outputs on real tokens as the original manual-attention path, has no NaNs even when a
+    row is mostly padding, and equals the original causal SDPA call when there is no padding.
     """
     torch.manual_seed(0)
     cfg = VLMConfig()

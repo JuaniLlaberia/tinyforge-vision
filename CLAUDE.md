@@ -27,8 +27,9 @@ explicitly ask for it.
 - **Borrowed files** start with a header naming the repo, tag/commit, and source file. The only
   permitted changes are: one blank line between definitions (nanoVLM uses two), double quotes, added
   docstrings and type hints, and import paths adapted to `tfv.`. No logic changes. The one
-  approved exception: the CPU/MPS attention branch in `tfv/models/language_model.py`, marked
-  `[tinyforge-vision]`.
+  approved exception: the attention branch in `tfv/models/language_model.py`, marked
+  `[tinyforge-vision]`, which merges the causal and padding masks on every device (recent PyTorch
+  rejects `attn_mask` together with `is_causal=True`, on CUDA too).
 - **The eval (`tfv/eval/`) is never changed logically**, so scores stay comparable with 35.3%.
 - **`VLMConfig` keeps every v0.1 field name**: `VisionLanguageModel.from_pretrained` loads the
   222M checkpoint with `VLMConfig(**config.json)`. The VLM keeps the attribute names
