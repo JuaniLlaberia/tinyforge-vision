@@ -18,19 +18,31 @@ SmolLM2 language model, connected by a pixel-shuffle projector and trained toget
 
 ## Results
 
-_To be filled in after training._
+MMStar on all 1,500 questions with 3 seeds (0, 1, 2); validation loss on the held-out 1% of the
+Cauldron. Trained on one A100 80 GB on Colab: 32,330 steps in 250 minutes.
 
-| Model | MMStar (mean ± std, 3 seeds) | Val loss | Training time |
+| Model | MMStar (mean ± std) | Val loss | Notes |
 | --- | --- | --- | --- |
 | nanoVLM-222M, published | 35.3% | - | ~6 h on one H100 |
-| nanoVLM-222M, scored with this repo's eval | | - | - |
-| TinyForge-Vision | | | |
+| nanoVLM-222M, scored with this repo's eval | 37.8% ± 0.9 | 1.90 | Same checkpoint, our eval |
+| TinyForge-Vision, `best_mmstar` | 27.6% ± 1.1 | 1.05 | Step ~12,000 of 32,330 |
+| TinyForge-Vision, `final` | 21.8% ± 0.9 | 0.99 | 5 epochs |
 
-Sample answers:
+The trained model is on the Hub as
+[Juanillaberia/TinyForge-Vision-222M](https://huggingface.co/Juanillaberia/TinyForge-Vision-222M).
+Sample answers, training curves and the full analysis are in [WRITEUP.md](WRITEUP.md).
 
 ## Conclusions
 
-_To be filled in after training._
+- The pipeline reproduces nanoVLM v0.1's code: the trained model fits the Cauldron as well as the
+  published checkpoint does in its own format (val loss 0.99 against 1.01).
+- The published checkpoint was not trained with the code tagged `v0.1`. It predates the tag and
+  was trained with a space between `Answer:` and the answer, which the tag removed. Its val loss
+  drops from 1.90 to 1.01 when that space is added, while ours rises from 0.99 to 2.24.
+- Training exactly with the tagged code gives 27.6% on MMStar instead of 37.8%. The missing space
+  is the most likely cause; it is not yet confirmed by retraining.
+- Val loss kept improving for all 5 epochs, but MMStar peaked at about 2 epochs: the Cauldron's
+  val loss does not predict the benchmark score.
 
 ## Repository layout
 
